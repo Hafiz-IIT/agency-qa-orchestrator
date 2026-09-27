@@ -1,0 +1,18 @@
+{
+  "requirements": [
+    "R1",
+    "R2"
+  ],
+  "artifacts": [
+    {
+      "id": "A1",
+      "covers": [
+        "R1"
+      ]
+    }
+  ],
+  "verification": {
+    "R1:test": true
+  },
+  "expected_delivery_ready": false
+}
