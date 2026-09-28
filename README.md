@@ -43,3 +43,8 @@ Deterministic tests verify that uncovered requirements and failed criteria block
 
 ## License
 MIT.
+
+## Extended implementation
+
+- `traceability.py` builds a requirement-to-artifact matrix and a release manifest.
+- Coverage gaps and verification gaps are exposed at requirement level.
