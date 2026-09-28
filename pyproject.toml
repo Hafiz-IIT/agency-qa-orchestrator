@@ -1,0 +1,14 @@
+[build-system]
+requires=["setuptools>=68"]
+build-backend="setuptools.build_meta"
+
+[project]
+name="agency-qa-orchestrator"
+version="0.1.0"
+description="Delivery-quality gate for AI-assisted software work: requirements, artifact coverage, acceptance criteria and verification evidence."
+requires-python=">=3.10"
+license={text="MIT"}
+authors=[{name="Syed Hafiz Ali"}]
+
+[tool.setuptools]
+py-modules=["agency_qa_orchestrator"]

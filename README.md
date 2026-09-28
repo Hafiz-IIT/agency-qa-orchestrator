@@ -1,28 +1,15 @@
 # Agency QA Orchestrator
 
-> **Generated output is not delivered work until requirements, artifacts, and verification evidence agree.**
+> Delivery-quality gate for AI-assisted software work: requirements, artifact coverage, acceptance criteria and verification evidence.
 
-The Automated AI Agency concept needs a control plane that prevents multi-agent generation from silently becoming client delivery. This repository implements a small requirements-to-evidence gate for artifacts and acceptance criteria.
+## Status
+**Reproducible prototype** with executable Python, tests, CI, architecture docs, evaluation criteria, roadmap, and citation metadata.
 
-## Implemented
-- requirements registry
-- acceptance criteria per requirement
-- artifact registry
-- requirement-to-artifact coverage mapping
-- verification records
-- coverage-gap detection
-- failed/unverified criterion detection
-- delivery-ready gate
-- evidence summary
+## Problem
+AI-generated deliverables can look complete while silently missing requirements, tests, documentation or acceptance evidence. Delivery readiness must be computed from inspectable coverage.
 
-## Repository map
-- `agency_qa_orchestrator.py` — core implementation
-- `tests/` — deterministic tests
-- `examples/` — sample case
-- `docs/architecture.md` — architecture
-- `docs/research-agenda.md` — experiments + research lineage
-- `STATUS.md` — claims boundary
-- `CITATION.cff` — citation metadata
+## Architecture
+Requirements → artifact mapping → acceptance criteria → verification records → coverage/verification gaps → delivery-ready gate.
 
 ## Run
 ```bash
@@ -30,14 +17,29 @@ python -m unittest discover -s tests -v
 python agency_qa_orchestrator.py
 ```
 
-## Pipeline
-**client requirements → artifacts → coverage map → acceptance checks → verification evidence → delivery gate**
+## Implemented
+- Requirement model
+- Artifact-to-requirement coverage
+- Acceptance criteria
+- Verification results
+- Coverage-gap detection
+- Unverified/failed criteria report
+- Delivery gate
+- Tests and CI
 
 ## Research lineage
-This is the QA/governance core of the older Automated AI Agency idea: requirement analysis, decomposition, multi-agent execution, verification, and controlled delivery.
+- *Modular AI Frameworks for Multi-Vertical Startup Innovation*
+- *Scalable Architectures for Distributed Intelligent Agents*
+- *Bridging Research and Entrepreneurship: A Model for Innovation in Emerging Economies*
 
-## Evaluation direction
-Simulate requirements with partial artifact coverage and imperfect verification; measure false-ready deliveries and reviewer workload under different gating rules.
+## Evaluation
+Deterministic tests verify that uncovered requirements and failed criteria block delivery, while fully covered and verified work passes.
 
-## Maturity
-**Research prototype.** It is not a deployed agency, code-generation platform, autonomous client portal, or production CI/CD system.
+## Limitations
+- No autonomous code generation
+- No external CI ingestion yet
+- No client billing/CRM layer
+- No claim of deployed AI agency
+
+## License
+MIT.
