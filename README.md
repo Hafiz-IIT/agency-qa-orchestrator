@@ -1,50 +1,49 @@
 # Agency QA Orchestrator
 
-> Delivery-quality gate for AI-assisted software work: requirements, artifact coverage, acceptance criteria and verification evidence.
+<p align="center"><strong>Evidence-Gated Delivery for AI-Assisted Software Work</strong><br/><sub>Requirements → artifacts → acceptance criteria → verification → release.</sub></p>
 
-## Status
-**Reproducible prototype** with executable Python, tests, CI, architecture docs, evaluation criteria, roadmap, and citation metadata.
+<p align="center"><img src="https://img.shields.io/badge/status-reproducible%20prototype-blue" alt="Prototype"/> <img src="https://img.shields.io/badge/focus-requirement%20traceability-orange" alt="Traceability"/></p>
 
-## Problem
-AI-generated deliverables can look complete while silently missing requirements, tests, documentation or acceptance evidence. Delivery readiness must be computed from inspectable coverage.
+## Research / engineering question
 
-## Architecture
-Requirements → artifact mapping → acceptance criteria → verification records → coverage/verification gaps → delivery-ready gate.
+**How can an AI-generated deliverable prove that it actually satisfies the requested requirements?**
 
-## Run
-```bash
-python -m unittest discover -s tests -v
-python agency_qa_orchestrator.py
+```
+Requirements
+    ↓
+Artifact coverage
+    ↓
+Acceptance criteria
+    ↓
+Verification evidence
+    ↓
+Coverage / verification gaps
+    ↓
+DELIVERY READY?
 ```
 
+## Try it
+
+```bash
+python agency_qa_orchestrator.py
+python -m unittest discover -s tests -v
+```
+
+`traceability.py` exports a requirement-level matrix and release manifest.
+
 ## Implemented
-- Requirement model
-- Artifact-to-requirement coverage
-- Acceptance criteria
-- Verification results
-- Coverage-gap detection
-- Unverified/failed criteria report
-- Delivery gate
-- Tests and CI
 
-## Research lineage
-- *Modular AI Frameworks for Multi-Vertical Startup Innovation*
-- *Scalable Architectures for Distributed Intelligent Agents*
-- *Bridging Research and Entrepreneurship: A Model for Innovation in Emerging Economies*
+- requirement model
+- artifact-to-requirement mapping
+- acceptance criteria
+- verification records
+- coverage-gap detection
+- release readiness gate
+- traceability matrix
+- deterministic CI
 
-## Evaluation
-Deterministic tests verify that uncovered requirements and failed criteria block delivery, while fully covered and verified work passes.
+## Why it belongs here
 
-## Limitations
-- No autonomous code generation
-- No external CI ingestion yet
-- No client billing/CRM layer
-- No claim of deployed AI agency
+This is the engineering counterpart to the evidence-governance work elsewhere in the portfolio: **an artifact should not be considered complete merely because an agent says it is complete.**
 
-## License
-MIT.
-
-## Extended implementation
-
-- `traceability.py` builds a requirement-to-artifact matrix and a release manifest.
-- Coverage gaps and verification gaps are exposed at requirement level.
+Related: [~haf.s__ OS Core](https://github.com/Hafiz-IIT/hafs-os-core)
