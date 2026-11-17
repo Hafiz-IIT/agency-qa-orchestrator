@@ -9,7 +9,7 @@ class TraceabilityTests(unittest.TestCase):
         qa = QAOrchestrator()
         qa.add_requirement(Requirement("R1", "API works", ("tested",)))
         qa.add_artifact(Artifact("A1", "api.py", {"R1"}))
-        qa.verify("R1", "tested", True)
+        qa.verify("R1", "tested", True, evidence_ref="tests/test_api.py::test_health")
         row = traceability_matrix(qa)[0]
         self.assertEqual(row["artifacts"], ["A1"])
         self.assertTrue(row["verified"])
