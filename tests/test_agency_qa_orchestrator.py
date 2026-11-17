@@ -1,4 +1,7 @@
 import unittest
+import subprocess
+import sys
+from pathlib import Path
 
 from agency_qa_orchestrator import Artifact, QAOrchestrator, Requirement
 
@@ -40,6 +43,11 @@ class QAOrchestratorTests(unittest.TestCase):
 
     def test_empty_requirements_are_not_release_ready(self):
         self.assertFalse(QAOrchestrator().delivery_ready())
+
+    def test_executable_demo_runs_with_evidence_reference(self):
+        script = Path(__file__).resolve().parents[1] / "agency_qa_orchestrator.py"
+        result = subprocess.run([sys.executable, str(script)], check=True, capture_output=True, text=True)
+        self.assertIn("delivery_ready", result.stdout)
 
 
 if __name__ == "__main__":
