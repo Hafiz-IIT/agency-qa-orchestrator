@@ -92,5 +92,5 @@ if __name__ == "__main__":
     qa = QAOrchestrator()
     qa.add_requirement(Requirement("R1", "API returns health status", ("test passes",)))
     qa.add_artifact(Artifact("A1", "api.py", {"R1"}))
-    qa.verify("R1", "test passes", True)
+    qa.verify("R1", "test passes", True, evidence_ref="tests/test_api.py::test_health")
     print(qa.evidence_summary())
