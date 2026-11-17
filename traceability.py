@@ -12,7 +12,10 @@ def traceability_matrix(qa: QAOrchestrator) -> list[dict]:
             if requirement_id in artifact.covers
         )
         criteria = {
-            criterion: qa.verifications.get((requirement_id, criterion))
+            criterion: {
+                "passed": qa.verifications.get((requirement_id, criterion)),
+                "evidence_ref": qa.verification_evidence.get((requirement_id, criterion)),
+            }
             for criterion in requirement.criteria
         }
         rows.append({
@@ -21,7 +24,7 @@ def traceability_matrix(qa: QAOrchestrator) -> list[dict]:
             "artifacts": artifacts,
             "criteria": criteria,
             "covered": bool(artifacts),
-            "verified": all(value is True for value in criteria.values()),
+            "verified": all(value["passed"] is True and bool(value["evidence_ref"]) for value in criteria.values()),
         })
     return rows
 
