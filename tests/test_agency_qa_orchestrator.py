@@ -17,6 +17,31 @@ class QAOrchestratorTests(unittest.TestCase):
         qa.verify("R1", "tested", False)
         self.assertFalse(qa.delivery_ready())
 
+    def test_empty_project_is_not_delivery_ready(self):
+        self.assertFalse(QAOrchestrator().delivery_ready())
+
+    def test_duplicate_requirement_and_artifact_ids_are_rejected(self):
+        qa = QAOrchestrator()
+        req = Requirement("R1", "x", ("tested",))
+        qa.add_requirement(req)
+        with self.assertRaises(ValueError):
+            qa.add_requirement(req)
+        artifact = Artifact("A1", "x.py", {"R1"})
+        qa.add_artifact(artifact)
+        with self.assertRaises(ValueError):
+            qa.add_artifact(artifact)
+
+    def test_artifact_cannot_cover_unknown_requirement(self):
+        qa = QAOrchestrator()
+        with self.assertRaises(ValueError):
+            qa.add_artifact(Artifact("A1", "x.py", {"R404"}))
+
+    def test_verification_requires_boolean(self):
+        qa = QAOrchestrator()
+        qa.add_requirement(Requirement("R1", "x", ("tested",)))
+        with self.assertRaises(ValueError):
+            qa.verify("R1", "tested", "false")
+
     def test_verified_covered_delivery_passes(self):
         qa = QAOrchestrator()
         qa.add_requirement(Requirement("R1", "x", ("tested", "documented")))
