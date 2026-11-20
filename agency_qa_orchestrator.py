@@ -9,12 +9,34 @@ class Requirement:
     text: str
     criteria: tuple[str, ...]
 
+    def __post_init__(self):
+        if not isinstance(self.requirement_id, str) or not self.requirement_id.strip():
+            raise ValueError("requirement_id must be non-empty")
+        if not isinstance(self.text, str) or not self.text.strip():
+            raise ValueError("requirement text must be non-empty")
+        if not isinstance(self.criteria, tuple) or not self.criteria or any(
+            not isinstance(item, str) or not item.strip() for item in self.criteria
+        ):
+            raise ValueError("criteria must be a non-empty tuple of non-empty strings")
+        if len(set(self.criteria)) != len(self.criteria):
+            raise ValueError("criteria must be unique")
+
 
 @dataclass
 class Artifact:
     artifact_id: str
     path: str
     covers: set[str] = field(default_factory=set)
+
+    def __post_init__(self):
+        if not isinstance(self.artifact_id, str) or not self.artifact_id.strip():
+            raise ValueError("artifact_id must be non-empty")
+        if not isinstance(self.path, str) or not self.path.strip():
+            raise ValueError("artifact path must be non-empty")
+        if not isinstance(self.covers, set) or any(
+            not isinstance(item, str) or not item.strip() for item in self.covers
+        ):
+            raise ValueError("covers must be a set of non-empty requirement IDs")
 
 
 class QAOrchestrator:
@@ -25,17 +47,15 @@ class QAOrchestrator:
         self.verification_evidence: dict[tuple[str, str], str] = {}
 
     def add_requirement(self, requirement: Requirement) -> None:
-        if not requirement.requirement_id.strip() or not requirement.text.strip() or not requirement.criteria:
-            raise ValueError("requirements need an id, description and at least one criterion")
-        if len(set(requirement.criteria)) != len(requirement.criteria) or any(not c.strip() for c in requirement.criteria):
-            raise ValueError("requirement criteria must be unique non-empty strings")
+        if not isinstance(requirement, Requirement):
+            raise TypeError("requirement must be a Requirement")
         if requirement.requirement_id in self.requirements:
             raise ValueError("requirement id already exists")
         self.requirements[requirement.requirement_id] = requirement
 
     def add_artifact(self, artifact: Artifact) -> None:
-        if not artifact.artifact_id.strip() or not artifact.path.strip():
-            raise ValueError("artifact id and path are required")
+        if not isinstance(artifact, Artifact):
+            raise TypeError("artifact must be an Artifact")
         if artifact.artifact_id in self.artifacts:
             raise ValueError("artifact id already exists")
         unknown = artifact.covers - set(self.requirements)
