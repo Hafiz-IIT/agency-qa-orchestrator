@@ -11,4 +11,4 @@ license={text="MIT"}
 authors=[{name="Syed Hafiz Ali"}]
 
 [tool.setuptools]
-py-modules=["agency_qa_orchestrator"]
+py-modules=["agency_qa_orchestrator", "traceability"]
