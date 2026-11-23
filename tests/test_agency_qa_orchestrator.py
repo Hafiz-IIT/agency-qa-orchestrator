@@ -23,12 +23,12 @@ class QAOrchestratorTests(unittest.TestCase):
 
     def test_failed_criterion_blocks_delivery(self):
         self.qa.add_artifact(Artifact("A1", "api.py", frozenset({"R1"})))
-        self.qa.verify("R1", "tested", False, evidence_path="test.log", verifier_id="reviewer", method="manual-test", verified_at=10)
+        self.qa.verify("R1", "tested", False, evidence_path="test.log", artifact_id="A1", verifier_id="reviewer", method="manual-test", verified_at=10)
         self.assertFalse(self.qa.delivery_ready())
 
     def test_verified_covered_delivery_passes(self):
         self.qa.add_artifact(Artifact("A1", "api.py", frozenset({"R1"})))
-        self.qa.verify("R1", "tested", True, evidence_path="test.log", verifier_id="ci", method="pytest", verified_at=10)
+        self.qa.verify("R1", "tested", True, evidence_path="test.log", artifact_id="A1", verifier_id="ci", method="pytest", verified_at=10)
         self.assertTrue(self.qa.delivery_ready())
 
     def test_missing_artifact_file_is_rejected(self):
@@ -37,7 +37,7 @@ class QAOrchestratorTests(unittest.TestCase):
 
     def test_artifact_change_invalidates_coverage_and_release(self):
         self.qa.add_artifact(Artifact("A1", "api.py", frozenset({"R1"})))
-        self.qa.verify("R1", "tested", True, evidence_path="test.log", verifier_id="ci", method="pytest", verified_at=10)
+        self.qa.verify("R1", "tested", True, evidence_path="test.log", artifact_id="A1", verifier_id="ci", method="pytest", verified_at=10)
         (self.root / "api.py").write_text("tampered\n", encoding="utf-8")
         self.assertEqual(self.qa.artifact_integrity_gaps(), ["A1"])
         self.assertEqual(self.qa.coverage_gaps(), ["R1"])
@@ -45,7 +45,7 @@ class QAOrchestratorTests(unittest.TestCase):
 
     def test_verification_evidence_change_invalidates_release(self):
         self.qa.add_artifact(Artifact("A1", "api.py", frozenset({"R1"})))
-        self.qa.verify("R1", "tested", True, evidence_path="test.log", verifier_id="ci", method="pytest", verified_at=10)
+        self.qa.verify("R1", "tested", True, evidence_path="test.log", artifact_id="A1", verifier_id="ci", method="pytest", verified_at=10)
         (self.root / "test.log").write_text("FAIL\n", encoding="utf-8")
         self.assertIn("R1:tested:evidence-changed", self.qa.failed_or_unverified())
         self.assertFalse(self.qa.delivery_ready())
@@ -64,9 +64,18 @@ class QAOrchestratorTests(unittest.TestCase):
 
     def test_criterion_and_boolean_are_validated(self):
         with self.assertRaisesRegex(ValueError, "criterion not registered"):
-            self.qa.verify("R1", "invented", True, evidence_path="test.log", verifier_id="ci", method="pytest", verified_at=10)
+            self.qa.verify("R1", "invented", True, evidence_path="test.log", artifact_id="A1", verifier_id="ci", method="pytest", verified_at=10)
         with self.assertRaisesRegex(ValueError, "passed must be a boolean"):
-            self.qa.verify("R1", "tested", "yes", evidence_path="test.log", verifier_id="ci", method="pytest", verified_at=10)
+            self.qa.verify("R1", "tested", "yes", evidence_path="test.log", artifact_id="A1", verifier_id="ci", method="pytest", verified_at=10)
+
+
+    def test_verification_must_reference_artifact_covering_requirement(self):
+        self.qa.add_artifact(Artifact("A1", "api.py", frozenset({"R1"})))
+        with self.assertRaisesRegex(ValueError, "registered artifact"):
+            self.qa.verify("R1", "tested", True, evidence_path="test.log", artifact_id="missing", verifier_id="ci", method="pytest", verified_at=10)
+        self.qa.add_requirement(Requirement("R2", "other", ("tested",)))
+        with self.assertRaisesRegex(ValueError, "does not cover"):
+            self.qa.verify("R2", "tested", True, evidence_path="test.log", artifact_id="A1", verifier_id="ci", method="pytest", verified_at=10)
 
     def test_requirement_criteria_must_not_be_empty(self):
         with self.assertRaisesRegex(ValueError, "non-empty tuple"):
