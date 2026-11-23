@@ -15,7 +15,7 @@ class TraceabilityTests(unittest.TestCase):
         self.qa = QAOrchestrator(self.root)
         self.qa.add_requirement(Requirement("R1", "API works", ("tested",)))
         self.qa.add_artifact(Artifact("A1", "api.py", frozenset({"R1"})))
-        self.qa.verify("R1", "tested", True, evidence_path="test.log", verifier_id="ci", method="pytest", verified_at=10)
+        self.qa.verify("R1", "tested", True, evidence_path="test.log", artifact_id="A1", verifier_id="ci", method="pytest", verified_at=10)
 
     def tearDown(self):
         self.temp.cleanup()
