@@ -239,6 +239,6 @@ if __name__ == "__main__":
         qa = QAOrchestrator(root)
         qa.add_requirement(Requirement("R1", "API returns health status", ("test passes",)))
         qa.add_artifact(Artifact("A1", "api.py", frozenset({"R1"})))
-        qa.verify("R1", "test passes", True, evidence_path="test.log",
+        qa.verify("R1", "test passes", True, evidence_path="test.log", artifact_id="A1",
                   verifier_id="ci-runner", method="pytest-log", verified_at=100)
         print(qa.evidence_summary())
