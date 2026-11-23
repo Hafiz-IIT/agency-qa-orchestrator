@@ -20,6 +20,8 @@ def traceability_matrix(qa: QAOrchestrator) -> list[dict]:
                 "passed": record.passed,
                 "evidence_path": record.evidence_path,
                 "evidence_sha256": record.evidence_sha256,
+                "artifact_id": record.artifact_id,
+                "artifact_sha256": record.artifact_sha256,
                 "verifier_id": record.verifier_id,
                 "method": record.method,
                 "verified_at": record.verified_at,

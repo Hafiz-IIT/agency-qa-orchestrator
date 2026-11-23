@@ -54,6 +54,8 @@ class VerificationRecord:
     passed: bool
     evidence_path: str
     evidence_sha256: str
+    artifact_id: str
+    artifact_sha256: str
     verifier_id: str
     method: str
     verified_at: float
@@ -61,7 +63,7 @@ class VerificationRecord:
     def __post_init__(self):
         if type(self.passed) is not bool:
             raise ValueError("passed must be a boolean")
-        for name in ("evidence_path", "evidence_sha256", "verifier_id", "method"):
+        for name in ("evidence_path", "evidence_sha256", "artifact_id", "artifact_sha256", "verifier_id", "method"):
             _require_text(getattr(self, name), name)
         _require_finite_time(self.verified_at, "verified_at")
 
@@ -128,6 +130,7 @@ class QAOrchestrator:
         passed: bool,
         *,
         evidence_path: str,
+        artifact_id: str,
         verifier_id: str,
         method: str,
         verified_at: float,
@@ -137,11 +140,22 @@ class QAOrchestrator:
             raise ValueError("criterion not registered")
         if type(passed) is not bool:
             raise ValueError("passed must be a boolean")
+        artifact = self.artifacts.get(artifact_id)
+        if artifact is None:
+            raise ValueError("verification must reference a registered artifact")
+        if requirement_id not in artifact.covers:
+            raise ValueError("verification artifact does not cover this requirement")
+        artifact_path = self._resolve_file(artifact.path)
+        artifact_sha256 = self._sha256(artifact_path)
+        if artifact_sha256 != self._artifact_hashes[artifact_id]:
+            raise ValueError("artifact changed since registration")
         path = self._resolve_file(evidence_path)
         record = VerificationRecord(
             passed=passed,
             evidence_path=evidence_path,
             evidence_sha256=self._sha256(path),
+            artifact_id=artifact_id,
+            artifact_sha256=artifact_sha256,
             verifier_id=verifier_id,
             method=method,
             verified_at=verified_at,
@@ -184,6 +198,18 @@ class QAOrchestrator:
                     continue
                 if current != record.evidence_sha256:
                     issues.append(f"{req_id}:{criterion}:evidence-changed")
+                    continue
+                artifact = self.artifacts.get(record.artifact_id)
+                if artifact is None or req_id not in artifact.covers:
+                    issues.append(f"{req_id}:{criterion}:artifact-unlinked")
+                    continue
+                try:
+                    artifact_current = self._sha256(self._resolve_file(artifact.path))
+                except (FileNotFoundError, ValueError):
+                    issues.append(f"{req_id}:{criterion}:artifact-missing")
+                    continue
+                if artifact_current != record.artifact_sha256:
+                    issues.append(f"{req_id}:{criterion}:artifact-changed")
         return issues
 
     def delivery_ready(self) -> bool:
@@ -213,6 +239,6 @@ if __name__ == "__main__":
         qa = QAOrchestrator(root)
         qa.add_requirement(Requirement("R1", "API returns health status", ("test passes",)))
         qa.add_artifact(Artifact("A1", "api.py", frozenset({"R1"})))
-        qa.verify("R1", "test passes", True, evidence_path="test.log",
+        qa.verify("R1", "test passes", True, evidence_path="test.log", artifact_id="A1",
                   verifier_id="ci-runner", method="pytest-log", verified_at=100)
         print(qa.evidence_summary())
